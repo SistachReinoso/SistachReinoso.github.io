@@ -46,3 +46,4 @@ exclude:
   - Makefile
   - build
   - .gitlab-ci.yml
+  - README.md
