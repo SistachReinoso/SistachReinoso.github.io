@@ -6,6 +6,9 @@ all:
 	@echo TODO
 
 local:
+	@echo rm -rf _site
+	@echo bundle config set --local path '/tmp/jekyll/build/gem'
+	@echo bundle exec jekyll serve --incremental
 	docker run \
 		-ti \
 		--init \
