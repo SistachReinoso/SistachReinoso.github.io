@@ -31,4 +31,8 @@ test:
 	gitlab-runner exec docker pages
 
 
+date:
+	date '+%F %X %z'
+
+
 .PHONY: all image
