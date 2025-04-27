@@ -16,26 +16,274 @@
    <style>@layer reset, kobweb-compose, base, component-styles, component-variants, restricted-styles, general-styles;@media not all and (min-width: 0px) {  .silk-display-if-at-least-zero { display: none !important; }}@media (min-width: 0px) {  .silk-display-until-zero { display: none !important; }}@media not all and (min-width: 30rem) {  .silk-display-if-at-least-sm { display: none !important; }}@media (min-width: 30rem) {  .silk-display-until-sm { display: none !important; }}@media not all and (min-width: 48rem) {  .silk-display-if-at-least-md { display: none !important; }}@media (min-width: 48rem) {  .silk-display-until-md { display: none !important; }}@media not all and (min-width: 62rem) {  .silk-display-if-at-least-lg { display: none !important; }}@media (min-width: 62rem) {  .silk-display-until-lg { display: none !important; }}@media not all and (min-width: 80rem) {  .silk-display-if-at-least-xl { display: none !important; }}@media (min-width: 80rem) {  .silk-display-until-xl { display: none !important; }}</style>
    <div class="silk-surface silk-smooth-color kobweb-box kobweb-align-top-start" style="min-height: 100vh;">
     <div class="kobweb-col kobweb-arrange-top kobweb-align-start">
-     <h1 id="todo">TODO</h1>
+     <p>Volem estudiar i analitzar si podem deduïr el perquè de la codificació del primer dígit d'un EAN 13.</p>
+     <h1 id="obtenint-informació">Obtenint informació</h1>
+     <p>Com podem llegir a la <a class="silk-link" href="https://en.wikipedia.org/wiki/International_Article_Number">wikipedia EAN</a>:</p>
+     <table>
+      <thead>
+       <tr>
+        <th>First digit</th>
+        <th>First group of 6 digits</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <td>0</td>
+        <td><code>LLLLLL</code></td>
+       </tr>
+       <tr>
+        <td>1</td>
+        <td><code>LLGLGG</code></td>
+       </tr>
+       <tr>
+        <td>2</td>
+        <td><code>LLGGLG</code></td>
+       </tr>
+       <tr>
+        <td>3</td>
+        <td><code>LLGGGL</code></td>
+       </tr>
+       <tr>
+        <td>4</td>
+        <td><code>LGLLGG</code></td>
+       </tr>
+       <tr>
+        <td>5</td>
+        <td><code>LGGLLG</code></td>
+       </tr>
+       <tr>
+        <td>6</td>
+        <td><code>LGGGLL</code></td>
+       </tr>
+       <tr>
+        <td>7</td>
+        <td><code>LGLGLG</code></td>
+       </tr>
+       <tr>
+        <td>8</td>
+        <td><code>LGLGGL</code></td>
+       </tr>
+       <tr>
+        <td>9</td>
+        <td><code>LGGLGL</code></td>
+       </tr>
+      </tbody>
+     </table>
+     <h2 id="primera-anàlisi">Primera anàlisi</h2>
+     <h3 id="el-zero">El zero</h3>
+     <p>Doncs sembla una codificació avorrida. No té cap relació amb la resta de codificacions.</p>
+     <h3 id="els-que-no-són-zero">Els que no són zero</h3>
      <ul>
-      <li>From <a class="silk-link" href="/blog/y2025/w12/kobweb">kobweb</a>
-       <ul>
-        <li>Automaticament, al fer <code>kobweb run</code> sapiga que és estàtica la web.</li>
-       </ul></li>
-      <li>From <a class="silk-link" href="/blog/y2025/w13/ean13">EAN 13</a>
-       <ul>
-        <li>Arquitectura per aprofitar-ho l'Android!</li>
-       </ul></li>
-      <li>From <a class="silk-link" href="/blog/y2025/w16/primer-digit-ean13">EAN 13 First digit</a>
-       <ul>
-        <li>Agraïr a persones (l'Aurora per les permutacions)</li>
-        <li>Equacions matemàtiques? <a class="silk-link" href="https://www.mathjax.org/">https://www.mathjax.org/</a></li>
-        <li>Codificació dels 30 valors diferents del EAN</li>
-       </ul></li>
+      <li>Tant per la codificació de l'1, del 2, del 3, del 4, del 5, del 6, del 7, del 8 i del 9 tenim un total de tres <code>L</code> i tres <code>G</code>.</li>
+      <li>Per a tots ells començarem amb la <code>L</code>.</li>
      </ul>
-     <h2 id="general">General</h2>
+     <h2 id="proposta-de-tècnica-mnemotècnica">Proposta de tècnica mnemotècnica</h2>
      <ul>
-      <li>Fer un Layaout per poder navegar fàcilment entre pàgines web.</li>
+      <li>Pel zero, tot <code>L</code>.</li>
+      <li>Seqüència incremental <code>000111</code> per l'u, el dos, el tres i el quatre.</li>
+      <li>La doble <code>LL</code> anar movent per la dreta pel cinc i sis.</li>
+      <li>El 7 alternats.</li>
+      <li>El 8 modifiquem els dos últims valors.</li>
+      <li>El 9 alterem els dos valors del mig.</li>
+     </ul>
+     <h2 id="proposta-meva">Proposta meva</h2>
+     <p>Tenim que sempre comença per una <code>L</code> i continua amb dues <code>L</code> més i tres <code>G</code>. Això fa un total de <code>frac{5!}{2!3!} = 10</code>, justament volem codificar deu elements. Llavors una proposta podria ser ordenar totes les permutacions possibles tenint el zero a la primera i el nou l'última.</p>
+     <table>
+      <thead>
+       <tr>
+        <th>Dígit</th>
+        <th>Proposta</th>
+        <th>Binari</th>
+        <th>Real</th>
+        <th>Comparat</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <td>0</td>
+        <td><code>LLLGGG</code></td>
+        <td>000111</td>
+        <td><code>LLLLLL</code></td>
+        <td><code>LLLLLL</code></td>
+       </tr>
+       <tr>
+        <td>1</td>
+        <td><code>LLGLGG</code></td>
+        <td>001011</td>
+        <td><code>LLGLGG</code></td>
+        <td>=</td>
+       </tr>
+       <tr>
+        <td>2</td>
+        <td><code>LLGGLG</code></td>
+        <td>001101</td>
+        <td><code>LLGGLG</code></td>
+        <td>=</td>
+       </tr>
+       <tr>
+        <td>3</td>
+        <td><code>LLGGGL</code></td>
+        <td>001110</td>
+        <td><code>LLGGGL</code></td>
+        <td>=</td>
+       </tr>
+       <tr>
+        <td>4</td>
+        <td><code>LGLLGG</code></td>
+        <td>010011</td>
+        <td><code>LGLLGG</code></td>
+        <td>=</td>
+       </tr>
+       <tr>
+        <td>5</td>
+        <td><code>LGLGLG</code></td>
+        <td>010101</td>
+        <td><code>LGGLLG</code></td>
+        <td>7</td>
+       </tr>
+       <tr>
+        <td>6</td>
+        <td><code>LGLGGL</code></td>
+        <td>010110</td>
+        <td><code>LGGGLL</code></td>
+        <td>9</td>
+       </tr>
+       <tr>
+        <td>7</td>
+        <td><code>LGGLLG</code></td>
+        <td>011001</td>
+        <td><code>LGLGLG</code></td>
+        <td>5</td>
+       </tr>
+       <tr>
+        <td>8</td>
+        <td><code>LGGLGL</code></td>
+        <td>011010</td>
+        <td><code>LGLGGL</code></td>
+        <td>6</td>
+       </tr>
+       <tr>
+        <td>9</td>
+        <td><code>LGGGLL</code></td>
+        <td>011100</td>
+        <td><code>LGGLGL</code></td>
+        <td>8</td>
+       </tr>
+      </tbody>
+     </table>
+     <p>Sembla força estrany aquesta diferència. Algú sap per què s'ha fet aquesta codificació i no la que proposo per exemple?</p>
+     <h3 id="codificació">Codificació</h3>
+     <p>Si normalitzem (restant 5), tenim el (24013). Calculo que es pot codificar amb 66.</p>
+     <table>
+      <thead>
+       <tr>
+        <th>Resultat</th>
+        <th>Permutació</th>
+        <th>Valor de la permutació</th>
+        <th>Següent permutació</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <td>0</td>
+        <td>24013</td>
+        <td><code>4! * 2 = 48</code></td>
+        <td>3012</td>
+       </tr>
+       <tr>
+        <td>48</td>
+        <td>3012</td>
+        <td><code>3! * 3 = 18</code></td>
+        <td>∅</td>
+       </tr>
+       <tr>
+        <td>66</td>
+        <td>∅</td>
+        <td></td>
+        <td></td>
+       </tr>
+      </tbody>
+     </table>
+     <p>Llavors amb només 7 bits podríem tenir el primer dígit codificat + el programari.</p>
+     <p>Farem una comprovació</p>
+     <table>
+      <thead>
+       <tr>
+        <th>Resultat</th>
+        <th>Valor a representar</th>
+        <th>Pendent</th>
+        <th>Obtenció de l'índex</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <td>∅</td>
+        <td>66</td>
+        <td>01234</td>
+        <td><code>66 / 4! = 18, 2</code></td>
+       </tr>
+       <tr>
+        <td>2</td>
+        <td>18</td>
+        <td>0134</td>
+        <td><code>18 / 3! = 0, 3</code></td>
+       </tr>
+       <tr>
+        <td>24013</td>
+        <td>0</td>
+        <td>∅</td>
+        <td></td>
+       </tr>
+      </tbody>
+     </table>
+     <h4 id="error-61">Error 61</h4>
+     <p>Em vaig equivocar, vaig treure el valor (23041) amb el que vaig obtenir el 61:</p>
+     <table>
+      <thead>
+       <tr>
+        <th>Resultat</th>
+        <th>Valor a representar</th>
+        <th>Pendent</th>
+        <th>Obtenció de l'índex</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <td>∅</td>
+        <td>61</td>
+        <td>01234</td>
+        <td><code>61 / 4! = 13, 2</code></td>
+       </tr>
+       <tr>
+        <td>2</td>
+        <td>13</td>
+        <td>0134</td>
+        <td><code>13 / 3! = 1, 2</code></td>
+       </tr>
+       <tr>
+        <td>23</td>
+        <td>1</td>
+        <td>014</td>
+        <td><code>1 / 2! = 1, 0</code></td>
+       </tr>
+       <tr>
+        <td>230</td>
+        <td>1</td>
+        <td>14</td>
+        <td><code>1 / 1! = 0, 1</code></td>
+       </tr>
+       <tr>
+        <td>23041</td>
+        <td>0</td>
+        <td>∅</td>
+        <td></td>
+       </tr>
+      </tbody>
+     </table>
+     <h1 id="dependències">Dependències</h1>
+     <ul>
+      <li>Calcular distàncies</li>
+      <li>Permutacions</li>
      </ul>
     </div>
    </div>
