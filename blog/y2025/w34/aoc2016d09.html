@@ -16,40 +16,52 @@
    <style>@layer reset, kobweb-compose, base, component-styles, component-variants, restricted-styles, general-styles;@media not all and (min-width: 0px) {  .silk-display-if-at-least-zero { display: none !important; }}@media (min-width: 0px) {  .silk-display-until-zero { display: none !important; }}@media not all and (min-width: 30rem) {  .silk-display-if-at-least-sm { display: none !important; }}@media (min-width: 30rem) {  .silk-display-until-sm { display: none !important; }}@media not all and (min-width: 48rem) {  .silk-display-if-at-least-md { display: none !important; }}@media (min-width: 48rem) {  .silk-display-until-md { display: none !important; }}@media not all and (min-width: 62rem) {  .silk-display-if-at-least-lg { display: none !important; }}@media (min-width: 62rem) {  .silk-display-until-lg { display: none !important; }}@media not all and (min-width: 80rem) {  .silk-display-if-at-least-xl { display: none !important; }}@media (min-width: 80rem) {  .silk-display-until-xl { display: none !important; }}</style>
    <div class="silk-surface silk-smooth-color kobweb-box kobweb-align-top-start" style="min-height: 100vh;">
     <div class="kobweb-col kobweb-arrange-top kobweb-align-start">
-     <h1 id="todo">TODO</h1>
-     <ul>
-      <li>From <a class="silk-link" href="/blog/y2025/w12/kobweb">kobweb</a>
-       <ul>
-        <li>Automàticament, al fer <code>kobweb run</code> sàpiga que és estàtica la web.</li>
-       </ul></li>
-      <li>From <a class="silk-link" href="/blog/y2025/w13/ean13">EAN 13</a>
-       <ul>
-        <li>Arquitectura per aprofitar-ho l'Android!</li>
-       </ul></li>
-      <li>From <a class="silk-link" href="/blog/y2025/w16/primer-digit-ean13">EAN 13 First digit</a>
-       <ul>
-        <li>Agraïr a persones (l'Aurora per les permutacions)</li>
-        <li>Equacions matemàtiques? <a class="silk-link" href="https://www.mathjax.org/">https://www.mathjax.org/</a></li>
-        <li>Codificació dels 30 valors diferents del EAN</li>
-       </ul></li>
-      <li>From <a class="silk-link" href="/blog/y2025/w28/interes">Interès</a>
-       <ul>
-        <li>Català</li>
-        <li>Habits</li>
-        <li>Mnemotècnics</li>
-        <li>Teixits</li>
-        <li>Matemàtiques: Permutacions, Fourier</li>
-        <li>Física (youtubers principalment)</li>
-        <li>Programació
-         <ul>
-          <li>Web</li>
-         </ul></li>
-       </ul></li>
-     </ul>
-     <h2 id="general">General</h2>
-     <ul>
-      <li>Fer un Layaout per poder navegar fàcilment entre pàgines web.</li>
-     </ul>
+     <p>Tot va començar intentant escanejar la informació. Per a fer-ho primer havia de definir el <code>enum</code> xulo, el <code>sealed</code>:</p>
+     <pre><code>sealed class Input {
+  class InputChar(val char: Char) : Input()
+  class Marker(val length: Int, val times: Int) : Input()
+}
+</code></pre>
+     <p>Tot i que tot seguit va semblar una mala aposta, ja que és més interessant tenir el <code>String</code> directament abans del <code>length</code>.</p>
+     <p>Vaig fer el parser un <code>Iterator</code>, però això complicava força el seu tractament de dades. Per aquest motiu, vaig reimplementar la solució 1, per poder-la aprofitar per a la solució 2.</p>
+     <h1 id="versió-2">Versió 2</h1>
+     <pre><code>sealed class InputV2 {
+  data class InputChar(val c: Char) : InputV2()
+  data class Marker(val string: String, val times: Int) : InputV2()
+}
+</code></pre>
+     <p>Això simplifica molt el parseig, ja que em permet treballar amb <code>sequence</code>, evita haver de definir el <code>next</code> i el complicat <code>hasNext</code>.</p>
+     <p>Tot i ser així, crec que podria sofrir alguna millora, ja que treballo amb <code>iterables</code> i crec que ho podria evitar:</p>
+     <pre><code>fun parsing(input: Sequence&lt;Char&gt;): Sequence&lt;InputV2&gt; = sequence {
+    val iterator: Iterator&lt;Char&gt; = input.iterator()
+    while (iterator.hasNext()) {
+        when (val char: Char = iterator.next()) {
+            '(' -&gt; markerParsing(iterator)
+            else -&gt; InputV2.InputChar(char)
+        }.let { yield(it) }
+    }
+}
+</code></pre>
+     <p>La resta sembla prou senzill:</p>
+     <pre><code>fun part1v2(fileString: String): Long = fileString
+    .asSequence()
+    .filter { char: Char -&gt; char !in " \n" }
+    .let(::parsing)
+    .sumOf { v: InputV2 -&gt;
+        when (v) {
+            is InputV2.InputChar -&gt; 1L
+            is InputV2.Marker -&gt; v.string.length.toLong() * v.times
+        }
+    }
+</code></pre>
+     <p>Finalment, la part 2, només ha sigut fer-ho recursiu:</p>
+     <pre><code>.sumOf { v: InputV2 -&gt;
+    when (v) {
+        is InputV2.InputChar -&gt; 1L
+        is InputV2.Marker -&gt; v.times * part2(v.string)
+    }
+}
+</code></pre>
     </div>
    </div>
   </div>

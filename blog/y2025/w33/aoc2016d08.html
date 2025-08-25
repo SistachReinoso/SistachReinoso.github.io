@@ -16,39 +16,56 @@
    <style>@layer reset, kobweb-compose, base, component-styles, component-variants, restricted-styles, general-styles;@media not all and (min-width: 0px) {  .silk-display-if-at-least-zero { display: none !important; }}@media (min-width: 0px) {  .silk-display-until-zero { display: none !important; }}@media not all and (min-width: 30rem) {  .silk-display-if-at-least-sm { display: none !important; }}@media (min-width: 30rem) {  .silk-display-until-sm { display: none !important; }}@media not all and (min-width: 48rem) {  .silk-display-if-at-least-md { display: none !important; }}@media (min-width: 48rem) {  .silk-display-until-md { display: none !important; }}@media not all and (min-width: 62rem) {  .silk-display-if-at-least-lg { display: none !important; }}@media (min-width: 62rem) {  .silk-display-until-lg { display: none !important; }}@media not all and (min-width: 80rem) {  .silk-display-if-at-least-xl { display: none !important; }}@media (min-width: 80rem) {  .silk-display-until-xl { display: none !important; }}</style>
    <div class="silk-surface silk-smooth-color kobweb-box kobweb-align-top-start" style="min-height: 100vh;">
     <div class="kobweb-col kobweb-arrange-top kobweb-align-start">
-     <h1 id="todo">TODO</h1>
+     <p>o.O Proposta per un futur pròxim:</p>
+     <p>O.o Donada una solució, el mínim de passos necessaris (rectangle, rotate) per obtenir el resultat desitjat.</p>
+     <hr class="silk-horizontal-divider">
+     <p>Xerrar sobre diferents problemes obtinguts:</p>
      <ul>
-      <li>From <a class="silk-link" href="/blog/y2025/w12/kobweb">kobweb</a>
+      <li>Com rotar un a la dreta, implica que he de moure'm molt (plantejament)
        <ul>
-        <li>Automàticament, al fer <code>kobweb run</code> sàpiga que és estàtica la web.</li>
+        <li>abc -&gt; rotar 1 a la dreta</li>
+        <li>si clonem abc i agafem el següent valor tenim problemes, just aconseguim el resultat invers, rotació a l'esquerra.</li>
+        <li>Llavors hem d'afegir el següent pas: <code>tot - rotació % tot</code>, llavors aconseguim el resultat desitjat</li>
+        <li>(!) Hi ha optimització, abans de clonar-ho tot, fer una <code>qua</code>, amb només els elements necessaris per la rotació (!)</li>
        </ul></li>
-      <li>From <a class="silk-link" href="/blog/y2025/w13/ean13">EAN 13</a>
+      <li>throw Error vs error() vs TODO
        <ul>
-        <li>Arquitectura per aprofitar-ho l'Android!</li>
+        <li><code>throw Error</code> sembla equivalent, més llarg i fà mandra.</li>
+        <li>El <code>TODO()</code>, només usar quan realment no està implementat!</li>
        </ul></li>
-      <li>From <a class="silk-link" href="/blog/y2025/w16/primer-digit-ean13">EAN 13 First digit</a>
+      <li><a class="silk-link" href="https://kotlinlang.org/docs/api-guidelines-predictability.html#validate-inputs-and-state">check vs require</a>
        <ul>
-        <li>Agraïr a persones (l'Aurora per les permutacions)</li>
-        <li>Equacions matemàtiques? <a class="silk-link" href="https://www.mathjax.org/">https://www.mathjax.org/</a></li>
-        <li>Codificació dels 30 valors diferents del EAN</li>
+        <li>Entenem que el <code>check</code> comprova un canvi d'estat de classe.</li>
+        <li>El <code>require</code> comprova l'input! Així que generalment haurem de posar <code>require</code> en el <code>AoC</code>.</li>
        </ul></li>
-      <li>From <a class="silk-link" href="/blog/y2025/w28/interes">Interès</a>
-       <ul>
-        <li>Català</li>
-        <li>Habits</li>
-        <li>Mnemotècnics</li>
-        <li>Teixits</li>
-        <li>Matemàtiques: Permutacions, Fourier</li>
-        <li>Física (youtubers principalment)</li>
-        <li>Programació
-         <ul>
-          <li>Web</li>
-         </ul></li>
-       </ul></li>
+      <li>Lectura de fitxer amb seqüència:</li>
      </ul>
-     <h2 id="general">General</h2>
+     <pre><code> fun getLinesFromResources(javaClass: Class&lt;Any&gt;, fileName: String = "input"): Sequence&lt;String&gt; = sequence {
+-    getFileFromResources(javaClass, fileName).useLines { lines: Sequence&lt;String&gt; -&gt;
+-        lines.forEach { yield(it) }
+-    }
++    getFileFromResources(javaClass, fileName).useLines { yieldAll(it) }
+ }
+</code></pre>
      <ul>
-      <li>Fer un Layaout per poder navegar fàcilment entre pàgines web.</li>
+      <li>Us sealed</li>
+     </ul>
+     <pre><code>sealed class Operation {
+    data class Rectangle(val wide: Int, val tall: Int) : Operation()
+    data class RotateRow(val row: Int, val amount: Int) : Operation()
+    data class RotateColumn(val column: Int, val amount: Int) : Operation()
+}
+</code></pre>
+     <ul>
+      <li>Forma estranya de fer una matriu</li>
+      <li><code>when</code> + <code>Unit</code>
+       <ul>
+        <li>Problemes curiosos de retornar un Unit dins del <code>when</code>.</li>
+       </ul></li>
+      <li><code>Unit</code> vs <code>Nothing</code>
+       <ul>
+        <li><code>Nothing</code> is a special type used to represent a value that never exists. A function with a return type of Nothing means that it never returns to the caller; it either throws an exception or enters an infinite loop.</li>
+       </ul></li>
      </ul>
     </div>
    </div>
