@@ -16,10 +16,54 @@
    <style>@layer reset, kobweb-compose, base, component-styles, component-variants, restricted-styles, general-styles;@media not all and (min-width: 0px) {  .silk-display-if-at-least-zero { display: none !important; }}@media (min-width: 0px) {  .silk-display-until-zero { display: none !important; }}@media not all and (min-width: 30rem) {  .silk-display-if-at-least-sm { display: none !important; }}@media (min-width: 30rem) {  .silk-display-until-sm { display: none !important; }}@media not all and (min-width: 48rem) {  .silk-display-if-at-least-md { display: none !important; }}@media (min-width: 48rem) {  .silk-display-until-md { display: none !important; }}@media not all and (min-width: 62rem) {  .silk-display-if-at-least-lg { display: none !important; }}@media (min-width: 62rem) {  .silk-display-until-lg { display: none !important; }}@media not all and (min-width: 80rem) {  .silk-display-if-at-least-xl { display: none !important; }}@media (min-width: 80rem) {  .silk-display-until-xl { display: none !important; }}</style>
    <div class="silk-surface silk-smooth-color kobweb-box kobweb-align-top-start" style="min-height: 100vh;">
     <div class="kobweb-col kobweb-arrange-top kobweb-align-start">
+     <p>En Joan i jo hem dissenyat la primera versió per la Pompeia.</p>
+     <p>Aquesta només tindrà una pantalla on podrem afegir llibres i els podrem visualitzar. Els elements d'aquesta llista seran:</p>
      <ul>
-      <li><a class="silk-link" href="/blog/y2025/w28/interes">interès</a></li>
-      <li><a class="silk-link" href="/blog/y2025/w28/tereseta">Tereseta</a></li>
+      <li>ISBN</li>
+      <li>títol</li>
+      <li>autors</li>
      </ul>
+     <p>Llavors el plà és seguir tres passos:</p>
+     <ol>
+      <li>Crear un repositori <code>git</code> que funcioni per <code>android</code> i <code>desktop</code>.</li>
+      <li>Crear un mòdul per llegir la base de dades, on inicialment serà a memòria.</li>
+      <li>Crear la visualització del tot el plegat.</li>
+     </ol>
+     <h1 id="1-crear-el-repo">1. Crear el repo</h1>
+     <p>Ha sigut fàcil amb la pàgina web <a class="silk-link" href="https://kmp.jetbrains.com/">https://kmp.jetbrains.com/</a></p>
+     <ul>
+      <li>Usarem la tècnica del <a class="silk-link" href="https://www.conventionalcommits.org/en/v1.0.0/">conventional commits</a></li>
+      <li>Només farem anar per Android i Desktop per simplificar
+       <ul>
+        <li>Deixarem una branca per afegir IOS + web</li>
+       </ul></li>
+     </ul>
+     <h1 id="2-crear-la-base-de-dades">2. Crear la base de dades</h1>
+     <p>Part força més complicada, només per nombrar i decidir-se que ha de fer en cada pas.</p>
+     <h2 id="isbn-validation">ISBN validation</h2>
+     <p>La clau principal per registrar un llibre és l'ISBN (Identify Standard Book Number)</p>
+     <h2 id="share-builds">Share builds</h2>
+     <ul>
+      <li><a class="silk-link" href="https://docs.gradle.org/current/userguide/sharing_build_logic_between_subprojects.html">https://docs.gradle.org/current/userguide/sharing_build_logic_between_subprojects.html</a>
+       <ul>
+        <li>Example:
+         <ul>
+          <li>Normal gradle.kts: <code>buildSrc/src/main/kotlin/common-conventions.gradle.kts</code></li>
+          <li>Used with:</li>
+         </ul></li>
+       </ul></li>
+     </ul>
+     <pre><code>plugins {
+  id("common-conventions")
+}
+</code></pre>
+     <h2 id="injection">Injection</h2>
+     <ul>
+      <li><a class="silk-link" href="https://developer.android.com/training/dependency-injection">https://developer.android.com/training/dependency-injection</a></li>
+      <li><a class="silk-link" href="https://dagger.dev/">https://dagger.dev/</a></li>
+     </ul>
+     <h1 id="3-crear-la-visualització">3. Crear la visualització</h1>
+     <p>Per poder afegir i eliminar llibres. Llavors serà una llista on tindrem un <code>(+)</code> per afegir i un <code>🗑</code> per eliminar.</p>
     </div>
    </div>
   </div>

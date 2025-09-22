@@ -16,9 +16,33 @@
    <style>@layer reset, kobweb-compose, base, component-styles, component-variants, restricted-styles, general-styles;@media not all and (min-width: 0px) {  .silk-display-if-at-least-zero { display: none !important; }}@media (min-width: 0px) {  .silk-display-until-zero { display: none !important; }}@media not all and (min-width: 30rem) {  .silk-display-if-at-least-sm { display: none !important; }}@media (min-width: 30rem) {  .silk-display-until-sm { display: none !important; }}@media not all and (min-width: 48rem) {  .silk-display-if-at-least-md { display: none !important; }}@media (min-width: 48rem) {  .silk-display-until-md { display: none !important; }}@media not all and (min-width: 62rem) {  .silk-display-if-at-least-lg { display: none !important; }}@media (min-width: 62rem) {  .silk-display-until-lg { display: none !important; }}@media not all and (min-width: 80rem) {  .silk-display-if-at-least-xl { display: none !important; }}@media (min-width: 80rem) {  .silk-display-until-xl { display: none !important; }}</style>
    <div class="silk-surface silk-smooth-color kobweb-box kobweb-align-top-start" style="min-height: 100vh;">
     <div class="kobweb-col kobweb-arrange-top kobweb-align-start">
-     <ul>
-      <li><a class="silk-link" href="/blog/y2025/w28/">28</a></li>
-     </ul>
+     <h1 id="parser-a-dos-temps">Parser a dos temps</h1>
+     <p>Primer de tot, em de parsejar l'input. Per asolir tal objectiu, necessitarem parsejar la informació en dos temps.</p>
+     <h2 id="primer-temps">Primer temps</h2>
+     <p>Tenim dues instruccions. La primera és el propi input i la segona és que fer al tenir dos microxips. Com que pot entregar els xips a un altre robot o al mateix output necessitarem aclarar-ho.</p>
+     <pre><code>sealed class Instructions {
+    data class Input2Bot(val input: Microchip, val robot: Robot) : Instructions()
+    data class GivenMicrochip(val id: Robot, val lower: Given, val higher: Given) : Instructions()
+}
+data class Given(val to: RobotOrOutput, val value: Int)
+enum class RobotOrOutput { ROBOT, OUTPUT }
+</code></pre>
+     <h2 id="segon-temps">Segon temps</h2>
+     <p>En realitat és un cas on tota l'informació no és progressiva. Només podem operar una vegada ja hem llegit tot el input.</p>
+     <p>Llavors s'ha de fer una segona compilació la qual definirà 3 llistes:</p>
+     <pre><code>class GameStatus(
+    val robots: RobotsStat,
+    val instructions: List&lt;Instructions.GivenMicrochip&gt;,
+    val output: RobotsStat,
+)
+</code></pre>
+     <h1 id="part-1">Part 1</h1>
+     <p>Si aconsegueixes fer un <code>sequence</code>, on a cada pas resumeixi el pas que fa:</p>
+     <pre><code>data class Part1Output(val robot: Robot, val lower: Microchip, val higher: Microchip)
+</code></pre>
+     <p>Amb això quedarà prou senzill.</p>
+     <h1 id="part-2">Part 2</h1>
+     <p>Si heu fet la solució del <code>sequence</code>, recordeu que s'ha de recorrer tot, sigui amb un <code>toList()</code></p>
     </div>
    </div>
   </div>
