@@ -17,12 +17,146 @@
    <div class="silk-surface silk-smooth-color" style="min-height: 100vh;">
     <h1 id="part-1">Part 1</h1>
     <h2 id="investigation">Investigation</h2>
+    <ul>
+     <li>one <code>machine</code> per line
+      <ul>
+       <li>light diagram between <code>[]</code>
+        <ul>
+         <li>where <code>.</code> means off and <code>#</code> means on.</li>
+         <li>lights are all initially off.</li>
+        </ul></li>
+       <li>one or more button between <code>()</code>
+        <ul>
+         <li>0 means the first light. <code>toggle</code> the light.</li>
+        </ul></li>
+       <li>joltage requirements between <code>{}</code></li>
+      </ul></li>
+    </ul>
+    <p>How many buttons?</p>
+    <pre><code>fun part1(machines: Sequence&lt;Machine&gt;): Long = machines
+    .maxOf { machine: Machine -&gt; machine.buttons.size.toLong() }
+// 13
+</code></pre>
+    <pre><code>2^13 = 8192
+</code></pre>
+    <p>All the combinations!</p>
+    <p>Lines</p>
+    <pre><code>wc -l input 
+191 input
+</code></pre>
     <h2 id="parsing">Parsing</h2>
+    <p>First we create a data class</p>
+    <pre><code>data class Machine(val goal: List&lt;Int&gt;, val buttons: List&lt;List&lt;Int&gt;&gt;, val joltage: List&lt;Int&gt;)
+</code></pre>
+    <p>Then a helper</p>
+    <pre><code>fun String.toIntList(): List&lt;Int&gt; = this
+    .drop(1).dropLast(1)
+    .split(",")
+    .map { it.toInt() }
+</code></pre>
+    <p>And the parser was not complicated</p>
+    <pre><code>fun parser2025d10(lines: Sequence&lt;String&gt;): Sequence&lt;Machine&gt; = lines
+    .map { line: String -&gt;
+        val split = line.split(' ')
+        Machine(
+            goal = split.first().drop(1).dropLast(1).withIndex().filter { it.value != '.' }.map { (i: Int, _) -&gt; i },
+            buttons = split.drop(1).dropLast(1).map { it.toIntList() },
+            joltage = split.last().toIntList()
+        )
+    }
+</code></pre>
     <h2 id="resolution">Resolution</h2>
     <h1 id="part-2">Part 2</h1>
     <h2 id="investigation-2">Investigation</h2>
+    <p>We started with BTS, but doesn't work...</p>
+    <pre><code>fun Machine.bfsJoltage(): Int {
+    val history: MutableSet&lt;List&lt;Int&gt;&gt; = mutableSetOf()
+    var nextSteps: Set&lt;List&lt;Int&gt;&gt; = mutableSetOf(List(joltage.size) { 0 })
+    var stepsCount = 0
+
+    while (nextSteps.isNotEmpty()) {
+        nextSteps = nextSteps.asSequence()
+            .flatMap { step: List&lt;Int&gt; -&gt;
+                buttons.generateNextSteps(step)
+                    .filter { it !in history }
+                    .filter { (it zip joltage).none { pair -&gt; pair.first &gt; pair.second } }
+            }
+            .toSet()
+
+        stepsCount++
+        if(joltage in nextSteps) return stepsCount
+        history.addAll(nextSteps)
+    }
+    error("Wi don't found the result $joltage")
+}
+
+fun List&lt;List&lt;Int&gt;&gt;.generateNextSteps(step: List&lt;Int&gt;): List&lt;List&lt;Int&gt;&gt; =
+    map { buttons: List&lt;Int&gt; -&gt;
+        val result = step.toMutableList()
+        buttons.forEach { button: Int -&gt; result[button] += 1 }
+        result
+    }
+</code></pre>
+    <p>More than 10 seconds to get the first result! We hope to improve that!</p>
+    <p>It seems a mathematics problem</p>
+    <pre><code>k 0 1 2 3 4
+a 1 0 1 1 1
+b 0 0 1 1 0
+c 1 0 0 0 1
+d 1 1 1 0 0
+e 0 1 1 1 1
+</code></pre>
+    <p>We hope the result <code>7 5 12 7 2</code></p>
+    <p>We can get this value combination of them like a sum!</p>
+    <p>3a + 4b = (3 0 3 3 3) + (0 0 4 4 0) = 3 0 7 7 3</p>
+    <p>What is the minimum combination to get this result?</p>
+    <p><a class="silk-link" href="https://en.wikipedia.org/wiki/System_of_linear_equations">https://en.wikipedia.org/wiki/System_of_linear_equations</a></p>
+    <p>Start with easier case</p>
+    <p><code>(3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}</code></p>
+    <p>/ 0 0 0 0<br>
+     | 0 1 0 0 | 0 0 1 1 \ 1 1 0 1</p>
+    <hr class="silk-horizontal-divider">
+    <p>The combination are big</p>
+    <pre><code>    machines.map(Machine::joltage).map(List&lt;Int&gt;::size).sorted().forEach(::println)
+</code></pre>
+    <p>On this we saw the matrix can be 10 x 10!</p>
+    <pre><code>.map { machine -&gt; if(machine.buttons.size != machine.joltage.size) println("buttons: ${machine.buttons} -- ${machine.joltage.size}") }
+/*
+...
+-&gt; 2 -- 4
+-&gt; 10 -- 9
+...
+ */
+</code></pre>
+    <p>Every size of buttons are unlike the same of joltages!</p>
     <h2 id="parsing-2">Parsing</h2>
+    <p>Try to get Matrix <code>A</code> of equation <code>Ax=b</code></p>
+    <pre><code>fun Machine.buttonsToA(): Array&lt;IntArray&gt; {
+    val m: Int = joltage.size
+    val n: Int = buttons.size
+    val A: Array&lt;IntArray&gt; = Array(m) { IntArray(n) { 0 } }
+    buttons.forEachIndexed { i: Int, button: List&lt;Int&gt; -&gt; button.forEach { j: Int -&gt; A[j][i] = 1 } }
+    return A
+}
+</code></pre>
     <h2 id="resolution-2">Resolution</h2>
+    <pre><code>18 722 is too low
+18 878 is too low
+18 981
+</code></pre>
+    <p>My solution was this</p>
+    <pre><code>fun part2(machines: Sequence&lt;Machine&gt;): Int {
+    loadOrTools()
+    return machines.sumOf { machine: Machine -&gt;
+        val A: Array&lt;IntArray&gt; = machine.buttonsToA()
+        val b: IntArray = machine.joltage.toIntArray()
+        solveMinimumPressesILP(A = A, b = b).sum()
+    }
+}
+</code></pre>
+    <p>For some wrong configurations, the result was modified!</p>
+    <p>At the end, searching the most precise or exact result <code>Ax=b</code> problem it works...</p>
+    <p>wow... The first time I used this kind of library!</p>
    </div>
   </div>
   <script src="/cucarell.js"></script>

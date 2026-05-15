@@ -17,12 +17,141 @@
    <div class="silk-surface silk-smooth-color" style="min-height: 100vh;">
     <h1 id="part-1">Part 1</h1>
     <h2 id="investigation">Investigation</h2>
+    <p>Lines</p>
+    <pre><code>wc input -l
+496 input
+</code></pre>
+    <p>Maximum value</p>
+    <pre><code>grep -Po '\d++' input | sort -V | tail -n 1
+`98403
+</code></pre>
+    <p>The values can store with <code>Int</code> and we can make force brute <code>496 * 495 = 245 520</code>.</p>
+    <p>But the area <code>98 403^2 = 9 683 150 409</code> we need a <code>Long</code> result. Is approx 5 times more big than the capacity of <code>Int</code>.</p>
     <h2 id="parsing">Parsing</h2>
+    <p>Without secrets</p>
+    <pre><code>fun parser2025d09(lines: Sequence&lt;String&gt;): Sequence&lt;CoordinatesInterfaceVersion2&gt; = lines
+    .map { line: String -&gt; line.split(',').map { it.toInt() } }
+    .map(CoordinatesVersion2::of)
+</code></pre>
     <h2 id="resolution">Resolution</h2>
+    <p>We can use force brute. only we need to expertice how calculate the squares area.</p>
+    <ul>
+     <li><code>2, 5</code> and <code>9, 7</code> == <code>(9 - 2 + 1) * (7 - 5 + 1) = 24</code></li>
+    </ul>
     <h1 id="part-2">Part 2</h1>
     <h2 id="investigation-2">Investigation</h2>
-    <h2 id="parsing-2">Parsing</h2>
+    <pre><code>grep -Po '^\d++' input | sort | uniq -c | wc
+    248     496    3427
+
+grep -Po '^\d++' input | sort | uniq -c | grep ' 2 ' | wc
+248     496    3427
+
+grep -Po '^\d++' input | sort | uniq -c | grep -v ' 2 '
+- empty -
+</code></pre>
+    <p>Every <code>X</code> is a key with only two apparitions.</p>
+    <pre><code>grep -Po '\d++$' input | sort | uniq -c | grep -v ' 2 '
+- empty -
+</code></pre>
+    <p>Every <code>Y</code> is a key with only two apparitions.</p>
+    <pre><code>grep -Po '^\d++' input | sort -V | head -n 1
+1878
+
+grep -Po '^\d++' input | sort -V | tail -n 1
+98403
+</code></pre>
+    <p>The values in <code>X</code> are between 1879 and 98403.</p>
+    <h3 id="try-to-understand-how-to-do-it">Try to understand how to do it!</h3>
+    <pre><code>1,1
+2,1
+2,2
+4,2
+4,4
+3,4
+3,3
+1,3
+
+XX
+oXoX
+XoXo
+  XX
+</code></pre>
+    <pre><code>val grid: MutableList&lt;MutableList&lt;Boolean&gt;&gt;
+val maxX: Int = red.maxOf { it.x }
+val maxY: Int = red.maxOf { it.y }
+grid = MutableList(maxY) { MutableList(maxX) { false } }
+</code></pre>
+    <p>This make error in memory!</p>
+    <h3 id="edges-approximation">Edges approximation</h3>
+    <p>Like the same of part 1 but with one filter!</p>
+    <pre><code>496^3 = 122 023 936
+496^2 =     246 016
+</code></pre>
+    <p>The marge of operations is very high!</p>
+    <h2 id="parser">Parser</h2>
+    <p>The Edges</p>
+    <pre><code>sealed interface Edge {
+    data class Horitzontal(val start: Int, val end: Int, val y: Int) : Edge
+    data class Vertical(val start: Int, val end: Int, val x: Int) : Edge
+
+    companion object {
+        fun of(pair: Pair&lt;CoordinatesVersion2, CoordinatesVersion2&gt;): Edge = of(pair.first, pair.second)
+        fun of(start: CoordinatesVersion2, end: CoordinatesVersion2): Edge = when {
+            start.y == end.y -&gt; Horitzontal(start = min(start.x, end.x), end = max(start.x, end.x), y = start.y)
+            start.x == end.x -&gt; Vertical(start = min(start.y, end.y), end = max(start.y, end.y), x = start.x)
+            else -&gt; error("Edge can be diagonal $start, $end")
+        }
+    }
+}
+</code></pre>
+    <p>Because in <code>Horitzontal</code> you have two times the same value, we can store only one and the same with <code>Vertical</code>.</p>
+    <p>And the <code>Area</code></p>
+    <pre><code>data class Area(val left: Int, val right: Int, val top: Int, val bottom: Int) {
+    operator fun contains(other: Edge): Boolean = when (other) {
+        is Edge.Horitzontal -&gt; other.y in bottom..top &amp;&amp; max(left, other.start) &lt;= min(right, other.end)
+        is Edge.Vertical -&gt; other.x in left..right &amp;&amp; max(bottom, other.start) &lt;= min(top, other.end)
+    }
+
+    fun getArea(): Long = (right - left + 1).toLong() * abs(top - bottom + 1)
+
+    fun inside(): Area = Area(
+        left = left + 1,
+        right = right - 1,
+        bottom = bottom + 1,
+        top = top - 1,
+    )
+
+    companion object {
+        fun of(pair: Pair&lt;CoordinatesVersion2, CoordinatesVersion2&gt;): Area = Area(
+            left = min(pair.first.x, pair.second.x),
+            right = max(pair.first.x, pair.second.x),
+            top = max(pair.first.y, pair.second.y),
+            bottom = min(pair.first.y, pair.second.y)
+        )
+    }
+}
+</code></pre>
+    <p>get Area is like the part 1. Inside is for the resolution and contains! <code>fun of</code> is the "parser".</p>
     <h2 id="resolution-2">Resolution</h2>
+    <p>I don't believe this option works!</p>
+    <p>We start with the classes: <code>Edge</code> and <code>Area</code> The main code was:</p>
+    <pre><code>fun greenZone(points: List&lt;CoordinatesVersion2&gt;, edges: List&lt;Edge&gt;): Long = points
+    .combinationOfTwo()
+    .map(Area::of)
+    .filter { area: Area -&gt; edges.none { edge: Edge -&gt; edge in area.inside() } }
+    .maxOf { area: Area -&gt; area.getArea() }
+</code></pre>
+    <p>Is all like part 1 less the filter! This is the key of that. <code>Edge</code> have only tree <code>Int</code>s. With the function <code>contains</code> and <code>inside</code>.</p>
+    <p>You are sure the <code>Area</code> are out if some <code>Edge</code> cross the inside of this area!</p>
+    <p>The problem, with only this filter, you aren't checking if some <code>Area</code>s are totally outside!</p>
+    <p>Could be like</p>
+    <pre><code>     BXX#
+     X  X
+AXXXX#  X
+X       X
+#XXXXXXX#
+</code></pre>
+    <p>With this input you can have some troubles. But I expected the biggest square was inner, not outside, and it works well ;)</p>
    </div>
   </div>
   <script src="/cucarell.js"></script>

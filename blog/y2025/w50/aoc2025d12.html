@@ -17,12 +17,52 @@
    <div class="silk-surface silk-smooth-color" style="min-height: 100vh;">
     <h1 id="part-1">Part 1</h1>
     <h2 id="investigation">Investigation</h2>
+    <p>polyomino packing algorithm</p>
+    <blockquote>
+     <p>How many of the regions can fit all the presents listed?</p>
+    </blockquote>
+    <pre><code>wc regions -l
+1000 regions
+</code></pre>
+    <p>Only 1000 lines! The result it is less than 1000.</p>
     <h2 id="parsing">Parsing</h2>
+    <p>I split in two different files, because I hate to use <code>Iterator</code>.</p>
+    <p>And it works well!</p>
+    <pre><code>data class Shape(val values: List&lt;CoordinatesVersion2&gt;)
+data class Region(val m: Int, val n: Int, val key: List&lt;Int&gt;)
+data class ParsingDay12(val shapes: List&lt;Shape&gt;, val regions: Sequence&lt;Region&gt;)
+</code></pre>
+    <p>With regions, I simplify the problem with:</p>
+    <pre><code>val split: List&lt;Int&gt; = line.split("""[x: ]++""".toRegex()).map { it.toInt() }
+</code></pre>
     <h2 id="resolution">Resolution</h2>
-    <h1 id="part-2">Part 2</h1>
-    <h2 id="investigation-2">Investigation</h2>
-    <h2 id="parsing-2">Parsing</h2>
-    <h2 id="resolution-2">Resolution</h2>
+    <p>I was spending a lot of time trying to do what they say... Then magically I get the result!</p>
+    <p>I don't understand how!</p>
+    <pre><code>fun Shape.rotateAndFlipped(): Set&lt;Shape&gt; = rotate()
+    .flatMap(Shape::flipped)
+    .toSet()
+
+private fun Shape.rotate(): Sequence&lt;Shape&gt; = sequence {
+    var rotated: List&lt;CoordinatesVersion2&gt; = values
+    repeat(6) {
+        yield(Shape.ofCoordinates(rotated))
+        rotated = rotated.map { (x: Int, y: Int) -&gt; CoordinatesVersion2(x = 2 - y, y = x) }
+    }
+}
+
+private fun Shape.flipped(): Sequence&lt;Shape&gt; = sequence {
+    yield(this@flipped)
+    values.map { c: CoordinatesVersion2 -&gt;
+        when (c.x) {
+            0 -&gt; CoordinatesVersion2(x = 2, y = c.y)
+            1 -&gt; c
+            2 -&gt; CoordinatesVersion2(x = 0, y = c.y)
+            else -&gt; error("Invalid coordinate between 0..2 but is: $c")
+        }
+    }.let { yield(Shape.ofCoordinates(it)) }
+}
+</code></pre>
+    <p>Is not necessary at all!</p>
    </div>
   </div>
   <script src="/cucarell.js"></script>

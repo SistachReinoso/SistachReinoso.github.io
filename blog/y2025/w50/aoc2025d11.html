@@ -17,6 +17,10 @@
    <div class="silk-surface silk-smooth-color" style="min-height: 100vh;">
     <h1 id="part-1">Part 1</h1>
     <h2 id="investigation">Investigation</h2>
+    <p>All keys appear only once!</p>
+    <pre><code>cat input | grep -Po '^[^:]++' | sort | uniq -c | grep -v 1
+- empty -
+</code></pre>
     <h2 id="parsing">Parsing</h2>
     <h2 id="resolution">Resolution</h2>
     <h1 id="part-2">Part 2</h1>
